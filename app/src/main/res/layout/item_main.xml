@@ -66,7 +66,7 @@
             android:textColor="@color/black" />
     </LinearLayout>
 
-    <LinearLayout
+    <com.yocn.toutiaopraise.ItemLinearLayout
         android:id="@+id/ll_praise"
         android:layout_width="0dp"
         android:layout_height="30dp"
@@ -85,11 +85,12 @@
             android:src="@drawable/praise_off" />
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_praise"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="3dp"
             android:text="957"
             android:textColor="@color/black" />
-    </LinearLayout>
+    </com.yocn.toutiaopraise.ItemLinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

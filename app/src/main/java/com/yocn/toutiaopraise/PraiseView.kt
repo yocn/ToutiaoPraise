@@ -1,6 +1,8 @@
 package com.yocn.toutiaopraise
 
+import android.animation.ValueAnimator
 import android.content.Context
+import android.graphics.Point
 import android.renderscript.Int2
 import android.util.AttributeSet
 import android.view.Gravity
@@ -18,8 +20,10 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+
 class PraiseView @JvmOverloads constructor(
     context: Context,
+    praisePoint: Point,
     attributeSet: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attributeSet, defStyleAttr) {
@@ -27,9 +31,9 @@ class PraiseView @JvmOverloads constructor(
     var isPartying = false;
     var curtNumber = 0
     var numberViews = mutableListOf<ImageView>()
+    var animStartPoint = Point()
 
     init {
-        startParty()
         praiseViewBinding =
             PraiseViewBinding.inflate(LayoutInflater.from(getContext()), this, true)
     }
@@ -38,11 +42,11 @@ class PraiseView @JvmOverloads constructor(
         isPartying = true;
         GlobalScope.launch {
             do {
-                delay(100)
                 GlobalScope.launch(Dispatchers.Main) {
                     updateNumber(curtNumber++)
                     praiseViewBinding.tvTest.text = curtNumber.toString()
                 }
+                delay(100)
             } while (isPartying)
         }
     }
@@ -118,4 +122,20 @@ class PraiseView @JvmOverloads constructor(
         layoutParam.height = currTagWH.y
         praiseViewBinding.ivPraiseTag.layoutParams = layoutParam
     }
+
+    fun getAnim() {
+        if (animStartPoint.x == 0) {
+            return
+        }
+        var randomPoint = Point()
+        var bezierEvaluator = BezierEvaluator(randomPoint)
+        var valueAnimator = ValueAnimator.ofObject(bezierEvaluator)
+        valueAnimator.addUpdateListener(object : ValueAnimator.AnimatorUpdateListener {
+            override fun onAnimationUpdate(animation: ValueAnimator?) {
+                var curr = animation?.animatedValue
+                LogUtil.d(curr.toString())
+            }
+        })
+    }
+
 }
