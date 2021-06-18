@@ -1,4 +1,4 @@
-package com.yocn.toutiaopraise;
+package com.yocn.toutiaopraise.util;
 
 import android.content.Context;
 import android.content.res.TypedArray;

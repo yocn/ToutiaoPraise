@@ -2,15 +2,13 @@ package com.yocn.toutiaopraise
 
 import android.os.Handler
 import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.yocn.toutiaopraise.databinding.ItemMainBinding
+import com.yocn.toutiaopraise.view.ItemLinearLayout
 
 class MainAdapter(val list: List<MainBean>) : RecyclerView.Adapter<MainAdapter.ViewHolder>() {
 

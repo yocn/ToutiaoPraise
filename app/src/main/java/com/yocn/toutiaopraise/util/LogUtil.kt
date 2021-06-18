@@ -1,4 +1,4 @@
-package com.yocn.toutiaopraise
+package com.yocn.toutiaopraise.util
 
 import android.util.Log
 import android.view.MotionEvent

@@ -5,10 +5,15 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import android.view.Gravity
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.yocn.toutiaopraise.databinding.ActivityMainBinding
+import com.yocn.toutiaopraise.util.CustomDividerItemDecoration
+import com.yocn.toutiaopraise.util.LogUtil
+import com.yocn.toutiaopraise.util.ScreenUtil
+import com.yocn.toutiaopraise.view.PraiseView
 
 class MainActivity : AppCompatActivity() {
     private val activityMainBinding by lazy {
@@ -64,11 +69,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun showPraiseView(x: Int, y: Int) {
-        val praiseView = PraiseView(this, Point(x, y))
+        val praiseView =
+            PraiseView(this, Point(x, y))
         activityMainBinding.tlContainerEffect.addView(praiseView)
+        val screenHeight = ScreenUtil.getScreenHeight(this)
         val lp = praiseView.layoutParams as FrameLayout.LayoutParams
-//        lp.bottomMargin = point[1]
-//        lp.gravity = Gravity.BOTTOM
+        lp.bottomMargin = screenHeight - y
+        lp.gravity = Gravity.BOTTOM
         praiseView.layoutParams = lp
         praiseView.startParty()
     }

@@ -1,10 +1,12 @@
-package com.yocn.toutiaopraise
+package com.yocn.toutiaopraise.view
 
 import android.content.Context
 import android.os.Handler
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.widget.LinearLayout
+import com.yocn.toutiaopraise.Constant
+import com.yocn.toutiaopraise.util.LogUtil
 
 class ItemLinearLayout @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -31,10 +33,13 @@ class ItemLinearLayout @JvmOverloads constructor(
         praiseIv.getLocationInWindow(position)
         LogUtil.d(position[0].toString(), position[1].toString())
         val message = showHandler?.obtainMessage(Constant.MESSAGE_PRAISE_SHOW)
-        message?.what = Constant.MESSAGE_PRAISE_SHOW
+        message?.what =
+            Constant.MESSAGE_PRAISE_SHOW
         message?.arg1 = position[0]
         message?.arg2 = position[1]
+        // 延时显示
         showHandler?.sendMessageDelayed(message!!, 500)
+        // 告诉上级view放弃使用事件，可以拦截
         showHandler?.sendEmptyMessage(Constant.MESSAGE_PRAISE_GIVE_UP)
     }
 

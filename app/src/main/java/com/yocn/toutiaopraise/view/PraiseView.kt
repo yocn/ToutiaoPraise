@@ -1,4 +1,4 @@
-package com.yocn.toutiaopraise
+package com.yocn.toutiaopraise.view
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -14,7 +14,11 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.annotation.IdRes
 import androidx.core.view.setPadding
+import com.yocn.toutiaopraise.BezierEvaluator
+import com.yocn.toutiaopraise.Constant
+import com.yocn.toutiaopraise.R
 import com.yocn.toutiaopraise.databinding.PraiseViewBinding
+import com.yocn.toutiaopraise.util.LogUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -112,8 +116,22 @@ class PraiseView @JvmOverloads constructor(
         numberViews.add(0, imageView)
     }
 
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, widthMeasureSpec)
+        var widthMeasureSpec = widthMeasureSpec
+        var heightMeasureSpec = heightMeasureSpec
+        setMeasuredDimension(
+            View.getDefaultSize(0, widthMeasureSpec),
+            View.getDefaultSize(0, heightMeasureSpec)
+        )
+        val childWidthSize = measuredWidth
+        val childHeightSize = measuredHeight
+        // 高度和宽度一样
+        widthMeasureSpec = MeasureSpec.makeMeasureSpec(
+            childWidthSize, MeasureSpec.EXACTLY
+        )
+        heightMeasureSpec = widthMeasureSpec
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     }
 
     private fun updateTagDrawable() {
