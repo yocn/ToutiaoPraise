@@ -7,6 +7,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.yocn.toutiaopraise.bean.MainBean
 import com.yocn.toutiaopraise.databinding.ItemMainBinding
 import com.yocn.toutiaopraise.view.ItemLinearLayout
 

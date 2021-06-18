@@ -1,5 +1,6 @@
 package com.yocn.toutiaopraise.view
 
+import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Point
@@ -13,12 +14,15 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.annotation.IdRes
+import androidx.core.animation.doOnEnd
 import androidx.core.view.setPadding
 import com.yocn.toutiaopraise.BezierEvaluator
 import com.yocn.toutiaopraise.Constant
 import com.yocn.toutiaopraise.R
+import com.yocn.toutiaopraise.bean.ProgressPoint
 import com.yocn.toutiaopraise.databinding.PraiseViewBinding
 import com.yocn.toutiaopraise.util.LogUtil
+import com.yocn.toutiaopraise.util.ScreenUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -31,12 +35,11 @@ class PraiseView @JvmOverloads constructor(
     attributeSet: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attributeSet, defStyleAttr) {
+    val TAG = "Party"
     val praiseViewBinding: PraiseViewBinding
     var isPartying = false;
     var curtNumber = 0
-    val startPoint = praisePoint
     var numberViews = mutableListOf<ImageView>()
-    var animStartPoint = Point()
 
     init {
         praiseViewBinding =
@@ -44,15 +47,17 @@ class PraiseView @JvmOverloads constructor(
     }
 
     fun startParty() {
-        isPartying = true;
-        GlobalScope.launch {
-            do {
-                GlobalScope.launch(Dispatchers.Main) {
-                    updateNumber(curtNumber++)
-                    praiseViewBinding.tvTest.text = curtNumber.toString()
-                }
-                delay(100)
-            } while (isPartying)
+        handler.post {
+            mockAPartyAnim()
+            isPartying = true;
+            GlobalScope.launch {
+                do {
+                    GlobalScope.launch(Dispatchers.Main) {
+                        updateNumber(curtNumber++)
+                    }
+                    delay(100)
+                } while (isPartying)
+            }
         }
     }
 
@@ -121,15 +126,11 @@ class PraiseView @JvmOverloads constructor(
         var widthMeasureSpec = widthMeasureSpec
         var heightMeasureSpec = heightMeasureSpec
         setMeasuredDimension(
-            View.getDefaultSize(0, widthMeasureSpec),
-            View.getDefaultSize(0, heightMeasureSpec)
+            View.getDefaultSize(0, widthMeasureSpec), View.getDefaultSize(0, heightMeasureSpec)
         )
         val childWidthSize = measuredWidth
-        val childHeightSize = measuredHeight
         // 高度和宽度一样
-        widthMeasureSpec = MeasureSpec.makeMeasureSpec(
-            childWidthSize, MeasureSpec.EXACTLY
-        )
+        widthMeasureSpec = MeasureSpec.makeMeasureSpec(childWidthSize, MeasureSpec.EXACTLY)
         heightMeasureSpec = widthMeasureSpec
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     }
@@ -142,20 +143,49 @@ class PraiseView @JvmOverloads constructor(
         praiseViewBinding.ivPraiseTag.layoutParams = layoutParam
     }
 
-    fun getAnim() {
-        if (animStartPoint.x == 0) {
-            return
-        }
-        var randomPoint = Point()
-        var endPoint = Point(0, startPoint.y)
-        var bezierEvaluator = BezierEvaluator(randomPoint)
-        var valueAnimator = ValueAnimator.ofObject(bezierEvaluator, startPoint)
+    var runningAnimatorList = arrayListOf<Animator>()
+    var cachedViewList = arrayListOf<ImageView>()
+
+    fun mockAPartyAnim() {
+        val iv = ImageView(context)
+        praiseViewBinding.flPartyContainer.addView(iv)
+        iv.setImageResource(Constant.icons[0])
+        val lp = iv.layoutParams as LayoutParams
+        lp.width = resources.getDimensionPixelOffset(R.dimen.dp40)
+        lp.height = resources.getDimensionPixelOffset(R.dimen.dp40)
+        iv.layoutParams = lp
+
+        val startPoint = ProgressPoint(measuredWidth, measuredHeight, 0f)
+        val endPoint = ProgressPoint(0, measuredHeight, 0f)
+        val centerPoint = ProgressPoint(measuredWidth / 2, measuredHeight / 2, 0f)
+        val valueAnimator =
+            ValueAnimator.ofObject(BezierEvaluator(centerPoint), startPoint, endPoint)
+        valueAnimator.duration = 700
         valueAnimator.addUpdateListener(object : ValueAnimator.AnimatorUpdateListener {
             override fun onAnimationUpdate(animation: ValueAnimator?) {
-                var curr = animation?.animatedValue
-                LogUtil.d(curr.toString())
+                val curr = animation?.animatedValue as ProgressPoint
+                lp.topMargin = curr.y
+                lp.leftMargin = curr.x
+                iv.layoutParams = lp
+                val process = curr.progress
+                if (process > 0.75f) {
+                    iv.alpha = (1f - curr.progress) * 4
+                }
+                LogUtil.d(TAG, process.toString())
             }
         })
+        valueAnimator.doOnEnd {
+            runningAnimatorList.remove(it)
+            praiseViewBinding.flPartyContainer.removeView(iv)
+        }
+        valueAnimator.start()
+        runningAnimatorList.add(valueAnimator)
     }
+
+//    fun getACachedView(): View {
+//        if (cachedViewList.size > 0) {
+//
+//        }
+//    }
 
 }

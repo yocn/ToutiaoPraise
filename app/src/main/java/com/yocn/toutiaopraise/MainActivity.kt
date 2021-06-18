@@ -9,6 +9,7 @@ import android.view.Gravity
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.yocn.toutiaopraise.bean.MainBean
 import com.yocn.toutiaopraise.databinding.ActivityMainBinding
 import com.yocn.toutiaopraise.util.CustomDividerItemDecoration
 import com.yocn.toutiaopraise.util.LogUtil
