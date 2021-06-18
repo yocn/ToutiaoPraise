@@ -30,6 +30,7 @@ class PraiseView @JvmOverloads constructor(
     val praiseViewBinding: PraiseViewBinding
     var isPartying = false;
     var curtNumber = 0
+    val startPoint = praisePoint
     var numberViews = mutableListOf<ImageView>()
     var animStartPoint = Point()
 
@@ -128,8 +129,9 @@ class PraiseView @JvmOverloads constructor(
             return
         }
         var randomPoint = Point()
+        var endPoint = Point(0, startPoint.y)
         var bezierEvaluator = BezierEvaluator(randomPoint)
-        var valueAnimator = ValueAnimator.ofObject(bezierEvaluator)
+        var valueAnimator = ValueAnimator.ofObject(bezierEvaluator, startPoint)
         valueAnimator.addUpdateListener(object : ValueAnimator.AnimatorUpdateListener {
             override fun onAnimationUpdate(animation: ValueAnimator?) {
                 var curr = animation?.animatedValue

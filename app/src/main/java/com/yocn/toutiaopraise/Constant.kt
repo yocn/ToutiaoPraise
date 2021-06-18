@@ -2,6 +2,9 @@ package com.yocn.toutiaopraise
 
 class Constant {
     companion object {
+        val MESSAGE_PRAISE_SHOW = 58920
+        val MESSAGE_PRAISE_GIVE_UP = 58921
+
         val numbers = arrayOf(
             R.drawable.num_0,
             R.drawable.num_1,

@@ -1,5 +1,6 @@
 package com.yocn.toutiaopraise
 
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -13,10 +14,15 @@ import com.yocn.toutiaopraise.databinding.ItemMainBinding
 
 class MainAdapter(val list: List<MainBean>) : RecyclerView.Adapter<MainAdapter.ViewHolder>() {
 
+    var showHandler: Handler? = null
     private var showListener: ShowInterface.OnPraiseShowPositionInterface? = null
 
     fun setShowistener(longClickListener: ShowInterface.OnPraiseShowPositionInterface) {
         this.showListener = longClickListener
+    }
+
+    fun setHandler(handler: Handler) {
+        showHandler = handler
     }
 
     inner class ViewHolder(itemMainBinding: ItemMainBinding) :
@@ -48,15 +54,12 @@ class MainAdapter(val list: List<MainBean>) : RecyclerView.Adapter<MainAdapter.V
         holder.praiseLl.setOnClickListener {
             holder.praiseIv.setImageResource(if (list[position].isPraise) R.drawable.praise_off else R.drawable.praise_on)
         }
-//        holder.praiseLl.setOnTouchListener { v, event ->
-//            touchListener?.onTouch(holder.praiseIv, event)
-//            false
-//        }
-        holder.praiseLl.setShowInterface(object : ShowInterface.OnPraiseShowInterface {
-            override fun show(isShow: Boolean) {
-                showListener?.show(isShow)
-                showListener?.showAnchor(holder.praiseIv)
-            }
-        })
+        holder.praiseLl.handler = showHandler
+//        holder.praiseLl.setShowInterface(object : ShowInterface.OnPraiseShowInterface {
+//            override fun show(isShow: Boolean) {
+//                showListener?.show(isShow)
+//                showListener?.showAnchor(holder.praiseIv)
+//            }
+//        })
     }
 }
