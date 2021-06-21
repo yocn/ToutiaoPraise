@@ -22,12 +22,11 @@ import com.yocn.toutiaopraise.R
 import com.yocn.toutiaopraise.bean.ProgressPoint
 import com.yocn.toutiaopraise.databinding.PraiseViewBinding
 import com.yocn.toutiaopraise.util.LogUtil
-import com.yocn.toutiaopraise.util.ScreenUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
+import kotlin.random.Random
 
 class PraiseView @JvmOverloads constructor(
     context: Context,
@@ -40,6 +39,10 @@ class PraiseView @JvmOverloads constructor(
     var isPartying = false;
     var curtNumber = 0
     var numberViews = mutableListOf<ImageView>()
+    val iconWidth by lazy {
+        resources.getDimensionPixelOffset(R.dimen.dp40)
+    }
+    val LIMIT_COIN = 20
 
     init {
         praiseViewBinding =
@@ -48,7 +51,6 @@ class PraiseView @JvmOverloads constructor(
 
     fun startParty() {
         handler.post {
-            mockAPartyAnim()
             isPartying = true;
             GlobalScope.launch {
                 do {
@@ -56,6 +58,18 @@ class PraiseView @JvmOverloads constructor(
                         updateNumber(curtNumber++)
                     }
                     delay(100)
+                } while (isPartying)
+            }
+            GlobalScope.launch {
+                do {
+                    LogUtil.d(TAG, "runningAnimatorList:::${runningAnimatorList.size}")
+                    if (runningAnimatorList.size > LIMIT_COIN) {
+                        break
+                    }
+                    GlobalScope.launch(Dispatchers.Main) {
+                        mockAPartyAnim()
+                    }
+                    delay(50)
                 } while (isPartying)
             }
         }
@@ -149,15 +163,20 @@ class PraiseView @JvmOverloads constructor(
     fun mockAPartyAnim() {
         val iv = ImageView(context)
         praiseViewBinding.flPartyContainer.addView(iv)
-        iv.setImageResource(Constant.icons[0])
+        iv.setImageResource(Constant.icons[Random.nextInt(Constant.icons.size)])
         val lp = iv.layoutParams as LayoutParams
-        lp.width = resources.getDimensionPixelOffset(R.dimen.dp40)
-        lp.height = resources.getDimensionPixelOffset(R.dimen.dp40)
+        lp.width = iconWidth
+        lp.height = iconWidth
         iv.layoutParams = lp
 
-        val startPoint = ProgressPoint(measuredWidth, measuredHeight, 0f)
-        val endPoint = ProgressPoint(0, measuredHeight, 0f)
-        val centerPoint = ProgressPoint(measuredWidth / 2, measuredHeight / 2, 0f)
+        val startPoint = ProgressPoint(measuredWidth - iconWidth, measuredHeight - iconWidth, 0f)
+        val endPoint = ProgressPoint(getRandomPoint(), 0f)
+        val centerPoint =
+            ProgressPoint(
+                startPoint.x + (endPoint.x - startPoint.x) / 2,
+                startPoint.y + (endPoint.y - startPoint.y) / 2,
+                0f
+            )
         val valueAnimator =
             ValueAnimator.ofObject(BezierEvaluator(centerPoint), startPoint, endPoint)
         valueAnimator.duration = 700
@@ -167,11 +186,19 @@ class PraiseView @JvmOverloads constructor(
                 lp.topMargin = curr.y
                 lp.leftMargin = curr.x
                 iv.layoutParams = lp
+                // alpha变化
                 val process = curr.progress
                 if (process > 0.75f) {
                     iv.alpha = (1f - curr.progress) * 4
                 }
-                LogUtil.d(TAG, process.toString())
+                // scale变化
+                if (process < 0.25) {
+                    iv.scaleX = process * 4
+                    iv.scaleY = process * 4
+                } else {
+                    iv.scaleX = 1 + process / 4
+                    iv.scaleY = 1 + process / 4
+                }
             }
         })
         valueAnimator.doOnEnd {
@@ -180,6 +207,24 @@ class PraiseView @JvmOverloads constructor(
         }
         valueAnimator.start()
         runningAnimatorList.add(valueAnimator)
+    }
+
+    val border by lazy { measuredHeight / 2 }
+
+    fun getRandomPoint(): Point {
+        val ran = Random.nextInt(measuredHeight)
+        var other = 0
+        if (ran < border) {
+            if (ran % 2 == 0) {
+                other = ran
+            } else {
+                other = measuredHeight - ran
+            }
+        } else {
+            other = measuredHeight - ran
+        }
+//        LogUtil.d(TAG, "ran:$ran  other:$other")
+        return Point(ran, other)
     }
 
 //    fun getACachedView(): View {

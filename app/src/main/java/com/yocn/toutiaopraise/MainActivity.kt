@@ -82,7 +82,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun hidePraiseView() {
-        LogUtil.d("hidePraiseView")
         val praiseView = activityMainBinding.tlContainerEffect.getChildAt(0)
         if (praiseView != null) {
             (praiseView as PraiseView).stopParty()
